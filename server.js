@@ -47,7 +47,15 @@ var query = function (res, query, params) {
 
 // get list
 app.get("/api/mahasiswa", function (req, res) {
-   var qr = "select * from mahasiswa";
+   var qr = "select * from data_mhs";
+   query(res, qr, null);
+});
+
+app.get("/api/mahasiswa/:id", function (req, res) {
+   var param = [
+      { name: 'id', sqltype: sql.Int, value: req.params.id }
+   ]
+   var qr = "select * from data_mhs where id = " + req.params.id;
    query(res, qr, null);
 });
 
@@ -56,13 +64,13 @@ app.post('/api/mahasiswa',function(req,res){
       { name: 'nrp', sqltype: sql.Char, value: req.body.nrp },
       { name: 'nama', sqltype: sql.VarChar, value: req.body.nama },
       { name: 'angkatan', sqltype: sql.Int, value: req.body.angkatan },
-      { name: 'gender', sqltype: sql.Char, value: req.body.jk },
-      { name: 'dob', sqltype: sql.Date, value: req.body.lahir },
-      { name: 'photo', sqltype: sql.Image, value: req.body.foto },
-      { name: 'active', sqltype: sql.Bit, value: req.body.aktif }
+      { name: 'gender', sqltype: sql.Char, value: req.body.gender },
+      { name: 'dob', sqltype: sql.Date, value: req.body.dob },
+      { name: 'photo', sqltype: sql.Image, value: req.body.photo },
+      { name: 'active', sqltype: sql.Bit, value: req.body.active }
     ]
     
-    var qr = "insert into mahasiswa (nrp,nama,gender,dob,photo,active,angkatan) values (@nrp, @nama, @gender, @dob, @photo, @active, @angkatan);"
+    var qr = "insert into data_mhs (nrp,nama,gender,dob,photo,active,angkatan) values (@nrp, @nama, @gender, @dob, @photo, @active, @angkatan);"
     query(res, qr, param);
 })
 
@@ -72,17 +80,18 @@ app.put('/api/mahasiswa/:id',function(req,res){
       { name: 'nrp', sqltype: sql.Char, value: req.body.nrp },
       { name: 'nama', sqltype: sql.VarChar, value: req.body.nama },
       { name: 'angkatan', sqltype: sql.Int, value: req.body.angkatan },
-      { name: 'gender', sqltype: sql.Char, value: req.body.jk },
-      { name: 'dob', sqltype: sql.Date, value: req.body.lahir },
-      { name: 'photo', sqltype: sql.Image, value: req.body.foto },
-      { name: 'active', sqltype: sql.Bit, value: req.body.aktif }
+      { name: 'gender', sqltype: sql.Char, value: req.body.gender },
+      { name: 'dob', sqltype: sql.Date, value: req.body.dob },
+      { name: 'photo', sqltype: sql.Image, value: req.body.photo },
+      { name: 'active', sqltype: sql.Bit, value: req.body.active }
     ]
-    var qr = "update mahasiswa set nrp = @nrp, nama = @nama, gender = @gender, dob = @dob, photo = @photo, active = @active, angkatan = @angkatan WHERE id = @id;"
+    console.log(param)
+    var qr = "update data_mhs set nrp = @nrp, nama = @nama, angkatan = @angkatan, gender = @gender, dob = @dob, photo = @photo, active = @active WHERE id = @id;"
     query(res, qr, param);
 })
 
-app.del('/api/mahasiswa/:id', function (req, res, next) {
-   var qr = "delete from mahasiswa where id=" + req.params.id;
+app.delete('/api/mahasiswa/:id', function (req, res, next) {
+   var qr = "delete from data_mhs where id=" + req.params.id;
    query(res, qr, null);
 })
 
