@@ -20,7 +20,7 @@ app.use(function (req, res, next) {
 
 app.get("/", function (req, response) {
    response.writeHead(200, { 'Content-Type': 'text/plain' });
-   response.end('CURRENTLY TESTING API v1.1');
+   response.end('CURRENTLY TESTING API v1.2');
 });
 
 const config = {
@@ -143,7 +143,7 @@ app.get("/api/unit/:id", cors(), function (req, res) {
    query(res, qr, null);
 });
 
-app.get("/api/unit/name/", cors(), function (req, res) {
+app.get("/api/unit-name", cors(), function (req, res) {
    var qr = "select id, nama as name from Unit";
    query(res, qr, null);
 });
