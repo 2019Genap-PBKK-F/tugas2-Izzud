@@ -143,6 +143,11 @@ app.get("/api/unit/:id", cors(), function (req, res) {
    query(res, qr, null);
 });
 
+app.get("/api/unit/name/:id", cors(), function (req, res) {
+   var qr = "select id, nama as name from Unit where id = " + req.params.id;
+   query(res, qr, null);
+});
+
 app.post('/api/unit',function(req,res){
    var param = [
       { name: 'KategoriUnit_id', sqltype: sql.Int, value: req.body.KategoriUnit_id },
