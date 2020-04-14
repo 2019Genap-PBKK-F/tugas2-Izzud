@@ -143,8 +143,8 @@ app.get("/api/unit/:id", cors(), function (req, res) {
    query(res, qr, null);
 });
 
-app.get("/api/unit/name/:id", cors(), function (req, res) {
-   var qr = "select id, nama as name from Unit where id = " + req.params.id;
+app.get("/api/unit/name/", cors(), function (req, res) {
+   var qr = "select id, nama as name from Unit";
    query(res, qr, null);
 });
 
