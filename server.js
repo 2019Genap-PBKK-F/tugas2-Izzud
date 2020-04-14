@@ -20,7 +20,7 @@ app.use(function (req, res, next) {
 
 app.get("/", function (req, response) {
    response.writeHead(200, { 'Content-Type': 'text/plain' });
-   response.end('CURRENTLY TESTING API');
+   response.end('CURRENTLY TESTING API v1.1');
 });
 
 const config = {
@@ -47,7 +47,7 @@ var query = function (res, query, params) {
                console.log('Query Error\n' + err)
             }
             else {
-               res.send(recordset)
+               res.send(recordset.recordset)
             }
          })
       }
