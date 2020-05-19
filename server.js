@@ -2,6 +2,7 @@ const express = require("express");
 var cors = require('cors');
 const app = express();
 const sql = require('mssql');
+var jwt = require('jsonwebtoken');
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -9,6 +10,9 @@ app.use(bodyParser.json())
 
 app.use(cors())
 app.options('*', cors());
+
+var jwtOptions = {}
+jwtOptions.secretOrKey = '454545454545';
 
 app.use(function (req, res, next) {
    //Enabling CORS 
@@ -20,7 +24,7 @@ app.use(function (req, res, next) {
 
 app.get("/", function (req, response) {
    response.writeHead(200, { 'Content-Type': 'text/plain' });
-   response.end('CURRENTLY TESTING API v1.X');
+   response.end('CURRENTLY TESTING API v2.X');
 });
 
 const config = {
@@ -48,12 +52,73 @@ var query = function (res, query, params) {
             }
             else {
                res.send(recordset.recordset)
-               console.log('Query: ' + query + " executed successfully!")
+               console.log('Query: ' + query + " executed successfully!\n")
             }
          })
       }
    })
 }
+
+app.post("/api/login", function (req, response) {
+   var param = [
+      { name: 'username', sqltype: sql.VarChar, value: req.body.username },
+      { name: 'password', sqltype: sql.VarChar, value: req.body.password }
+   ]
+   qr = 'select case when exists (select 1 from SatuanKerja where email = @username AND email = @password) then 1 else 0 END AS res'
+
+   sql.connect(config, function (err) {
+      login = null;
+      if (err) {
+         response.end('Connection Error\n' + err)
+      }
+      else {
+         var request = new sql.Request()
+         if (param != null){
+            param.forEach(function (p) {
+               request.input(p.name, p.sqltype, p.value);
+            });
+         }
+         request.query(qr, function (err, recordset) {
+            if (err) {
+               console.log('Query Error\n' + err)
+            }
+            else {
+               login = recordset.recordset
+
+               if(login[0].res == 1){
+                  var user = req.body.username
+                  var payload = {id: user};
+                  var token = jwt.sign(payload, jwtOptions.secretOrKey);
+                  response.json({status : 200, user: req.body.username, token: token});
+                  console.log('User: ' + req.body.username + " has logged in.")
+               }
+               else{
+                  response.json({status : 401});
+                  console.log('Username/Password combination is incorrect.');
+               }
+            }
+         })
+      }
+   })
+});
+
+app.get("/api/login", function (req, response) {
+   response.writeHead(200, { 'Content-Type': 'text/plain' });
+   response.end('LOGIN API\nPLEASE USE POST METHOD');
+});
+
+app.get("/api/indikator/:id", function(req, res){
+   var param = [
+      { name: 'id_satker', sqltype: sql.UniqueIdentifier, value: req.params.id }, 
+   ]
+   var qr = "SELECT T2.aspek, T2.komponen, T2.Master_nama, Indikator_SatuanKerja.bobot, Indikator_SatuanKerja.target, Indikator_SatuanKerja.capaian, Indikator_SatuanKerja.last_update FROM Indikator_SatuanKerja INNER JOIN (SELECT Aspek.aspek as aspek, Aspek.komponen_aspek as komponen, MasterIndikator.nama as Master_nama, MasterIndikator.id as Master_id FROM MasterIndikator INNER JOIN Aspek ON MasterIndikator.id_aspek=Aspek.id) AS T2 ON T2.Master_id=Indikator_SatuanKerja.id_master WHERE Indikator_SatuanKerja.id_satker = @id_satker";
+   query(res, qr, param);
+})
+
+app.get("/api/konkin-list", function(req, res){
+   var qr = "SELECT id_satker as id, nama as name FROM SatuanKerja WHERE ((nama LIKE 'Departemen%') OR (nama LIKE 'Fakultas%')) "
+   query(res, qr, null);
+})
 
 /*** 
  * API untuk table DataDasar
