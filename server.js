@@ -120,11 +120,11 @@ app.get("/api/konkin-list", function(req, res){
    query(res, qr, null);
 })
 
-app.get("/api/nama-satker", function(req, res){
+app.get("/api/nama-satker/:id", function(req, res){
    var param = [
       { name: 'id_satker', sqltype: sql.UniqueIdentifier, value: req.params.id }, 
    ]
-   var qr = "SELECT nama as name FROM SatuanKerja WHERE id_satker = @id_satker) "
+   var qr = "SELECT nama as name FROM SatuanKerja WHERE id_satker = @id_satker "
    query(res, qr, param);
 })
 
