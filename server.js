@@ -11,23 +11,23 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-app.use(cors());
-// app.options('*', cors());
+app.use(cors())
+app.options('*', cors());
 
 var jwtOptions = {}
 jwtOptions.secretOrKey = '454545454545';
 
-// app.use(function (req, res, next) {
-//    //Enabling CORS 
-//    res.header("Access-Control-Allow-Origin", "*");
-//    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
-//    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, contentType,Content-Type, Accept, Authorization");
-//    next();
-//  });
+app.use(function (req, res, next) {
+   //Enabling CORS 
+   res.header("Access-Control-Allow-Origin", "*");
+   res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
+   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, contentType,Content-Type, Accept, Authorization");
+   next();
+ });
 
 app.get("/", function (req, response) {
    response.writeHead(200, { 'Content-Type': 'text/plain' });
-   response.end('CURRENTLY TESTING API v3.X ON HTTPS PROTOCOL');
+   response.end('CURRENTLY TESTING API v3.WHATEVER ON HTTPS PROTOCOL');
 });
 
 const config = {
@@ -699,5 +699,5 @@ https.createServer({
    cert: fs.readFileSync(__dirname+'/izzud.github.io.cert', 'utf8')
  }, app)
  .listen(port, function () {
-   console.log('HTTPS app listening on port 8007!')
+   console.log('HTTPs app listening on port 8007!')
  })
