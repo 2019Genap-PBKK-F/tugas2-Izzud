@@ -127,7 +127,7 @@ app.post("/api/login", function (req, response) {
             else {
                login = recordset.recordset
 
-               if(login[0].res == 1){
+               if(login[0].res && login[0].res != null && login[0].res == 1){
                   var user = login[0].nama
                   var payload = {id: user};
                   var token = jwt.sign(payload, jwtOptions.secretOrKey);
