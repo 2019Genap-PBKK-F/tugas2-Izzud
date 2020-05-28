@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const https = require('https');
 const app = express();
 const port = 8007;
+const hostname = '10.199.14.46';
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -114,7 +115,7 @@ app.get("/api/indikator/:id", function(req, res){
    var param = [
       { name: 'id_satker', sqltype: sql.UniqueIdentifier, value: req.params.id }, 
    ]
-   var qr = "SELECT T2.aspek, T2.komponen, T2.Master_nama, Indikator_SatuanKerja.bobot, Indikator_SatuanKerja.target, Indikator_SatuanKerja.capaian, Indikator_SatuanKerja.last_update FROM Indikator_SatuanKerja INNER JOIN (SELECT Aspek.aspek as aspek, Aspek.komponen_aspek as komponen, MasterIndikator.nama as Master_nama, MasterIndikator.id as Master_id FROM MasterIndikator INNER JOIN Aspek ON MasterIndikator.id_aspek=Aspek.id) AS T2 ON T2.Master_id=Indikator_SatuanKerja.id_master WHERE Indikator_SatuanKerja.id_satker = @id_satker";
+   var qr = "SELECT T2.aspek, T2.komponen, T2.Master_nama, ROUND(Indikator_SatuanKerja.bobot, 3) as bobot, ROUND(Indikator_SatuanKerja.target, 3) as target, CONCAT(round(Indikator_SatuanKerja.capaian, 3), CONCAT(' (',CONCAT(round(Indikator_SatuanKerja.capaian/(Indikator_SatuanKerja.target+0.01),1),'%)'))) as capaian, Indikator_SatuanKerja.last_update FROM Indikator_SatuanKerja INNER JOIN (SELECT Aspek.aspek as aspek, Aspek.komponen_aspek as komponen, MasterIndikator.nama as Master_nama, MasterIndikator.id as Master_id FROM MasterIndikator INNER JOIN Aspek ON MasterIndikator.id_aspek=Aspek.id) AS T2 ON T2.Master_id=Indikator_SatuanKerja.id_master WHERE Indikator_SatuanKerja.id_satker = @id_satker";
    query(res, qr, param);
 })
 
@@ -123,7 +124,7 @@ app.get("/api/konkin-list/:id", function(req, res){
       { name: 'id_satker', sqltype: sql.UniqueIdentifier, value: req.params.id }, 
    ]
    var qr = "SELECT DISTINCT T1.id_satker as id, T2.nama as name FROM Indikator_SatuanKerja AS T1 INNER JOIN SatuanKerja AS T2 \
-            ON T1.id_satker=T2.id_satker WHERE ((T2.id_satker = @id_satker) OR (T2.id_induk_satker = @id_satker));"
+            ON T1.id_satker=T2.id_satker WHERE ((T2.id_satker = @id_satker) OR (T2.id_induk_satker = @id_satker)) ORDER BY T2.nama DESC;"
    query(res, qr, param);
 })
 
@@ -690,6 +691,14 @@ app.delete('/api/mahasiswa/:id', function (req, res, next) {
 })
 
 // Console will print the message
-app.listen(8007, function () {
-   console.log('CORS-enabled web server listening on port 8007')
-})
+// app.listen(8007, function () {
+//    console.log('CORS-enabled web server listening on port 8007')
+// })
+
+https.createServer({
+   key: fs.readFileSync(__dirname+'/izzud.github.io.key', 'utf8'),
+   cert: fs.readFileSync(__dirname+'/izzud.github.io.cert', 'utf8')
+ }, app)
+ .listen(port, hostname, function () {
+   console.log('HTTPs app listening on port 8007! Go to https://'+hostname+':'+port+'/')
+ })
