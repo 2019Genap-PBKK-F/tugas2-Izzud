@@ -62,13 +62,52 @@ var query = function (res, query, params) {
    })
 }
 
+/*** 
+ * API untuk table dosen
+ */
+app.get("/api/dosen/", function(req, res)
+{
+      var qr = "select * from dosen"
+      query(res, qr, null)
+})
+
+/*** 
+* API untuk table abmas
+*/
+app.get("/api/abmas/", function(req, res)
+{
+     var qr = "select * from abmas"
+     query(res, qr, null)
+})
+
+/*** 
+* API untuk table penelitian
+*/
+app.get("/api/penelitian/", function(req, res)
+{
+     var qr = "select * from penelitian"
+     query(res, qr, null)
+})
+
+/*** 
+* API untuk table publikasi
+*/
+app.get("/api/publikasi/", function(req, res)
+{
+     var qr = "select * from publikasi"
+     query(res, qr, null)
+})
+
+/*** 
+* API untuk Login
+*/
 app.post("/api/login", function (req, response) {
    var param = [
       { name: 'username', sqltype: sql.VarChar, value: req.body.username },
       { name: 'password', sqltype: sql.VarChar, value: req.body.password }
    ]
    qr = 'select 1 as res, nama, id_satker from SatuanKerja where email = @username AND email = @password'
-
+   
    sql.connect(config, function (err) {
       login = null;
       if (err) {
@@ -600,45 +639,6 @@ app.delete("/api/aspek/:id", function(req, res)
    query(res, qr, param)
 })
 
-/*** 
- * API untuk table dosen
- */
-
-app.get("/api/dosen/", function(req, res)
-{
-      var qr = "select * from dosen"
-      query(res, qr, null)
-})
-
-/*** 
-* API untuk table abmas
-*/
-
-app.get("/api/abmas/", function(req, res)
-{
-     var qr = "select * from abmas"
-     query(res, qr, null)
-})
-
-/*** 
-* API untuk table penelitian
-*/
-
-app.get("/api/penelitian/", function(req, res)
-{
-     var qr = "select * from penelitian"
-     query(res, qr, null)
-})
-
-/*** 
-* API untuk table publikasi
-*/
-
-app.get("/api/publikasi/", function(req, res)
-{
-     var qr = "select * from publikasi"
-     query(res, qr, null)
-})
 
 /*** 
  * API untuk table data_mhs
