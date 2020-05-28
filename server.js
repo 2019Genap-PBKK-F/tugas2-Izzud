@@ -1,8 +1,11 @@
 const express = require("express");
-var cors = require('cors');
-const app = express();
+const cors = require('cors');
+const fs = require('fs')
 const sql = require('mssql');
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
+const https = require('https');
+const app = express();
+const port = 8007;
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -64,7 +67,7 @@ app.post("/api/login", function (req, response) {
       { name: 'username', sqltype: sql.VarChar, value: req.body.username },
       { name: 'password', sqltype: sql.VarChar, value: req.body.password }
    ]
-   qr = 'select case when exists (select 1 from SatuanKerja where email = @username AND email = @password) then 1 else 0 END AS res'
+   qr = 'select 1 as res, nama, id_satker from SatuanKerja where email = @username AND email = @password'
 
    sql.connect(config, function (err) {
       login = null;
@@ -86,10 +89,10 @@ app.post("/api/login", function (req, response) {
                login = recordset.recordset
 
                if(login[0].res == 1){
-                  var user = req.body.username
+                  var user = login[0].nama
                   var payload = {id: user};
                   var token = jwt.sign(payload, jwtOptions.secretOrKey);
-                  response.json({status : 200, user: req.body.username, token: token});
+                  response.json({status : 200, user: user, token: token, id_satker: login[0].id_satker});
                   console.log('User: ' + req.body.username + " has logged in.")
                }
                else{
@@ -115,9 +118,13 @@ app.get("/api/indikator/:id", function(req, res){
    query(res, qr, param);
 })
 
-app.get("/api/konkin-list", function(req, res){
-   var qr = "SELECT id_satker as id, nama as name FROM SatuanKerja WHERE ((nama LIKE 'Departemen%') OR (nama LIKE 'Fakultas%')) "
-   query(res, qr, null);
+app.get("/api/konkin-list/:id", function(req, res){
+   var param = [
+      { name: 'id_satker', sqltype: sql.UniqueIdentifier, value: req.params.id }, 
+   ]
+   var qr = "SELECT DISTINCT T1.id_satker as id, T2.nama as name FROM Indikator_SatuanKerja AS T1 INNER JOIN SatuanKerja AS T2 \
+            ON T1.id_satker=T2.id_satker WHERE ((T2.id_satker = @id_satker) OR (T2.id_induk_satker = @id_satker));"
+   query(res, qr, param);
 })
 
 app.get("/api/nama-satker/:id", function(req, res){
