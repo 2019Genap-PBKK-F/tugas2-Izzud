@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const https = require('https');
 const app = express();
 const port = 8007;
-const hostname = '10.199.14.46';
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -699,6 +698,6 @@ https.createServer({
    key: fs.readFileSync(__dirname+'/izzud.github.io.key', 'utf8'),
    cert: fs.readFileSync(__dirname+'/izzud.github.io.cert', 'utf8')
  }, app)
- .listen(port, hostname, function () {
-   console.log('HTTPs app listening on port 8007! Go to https://'+hostname+':'+port+'/')
+ .listen(port, function () {
+   console.log('HTTPS app listening on port 8007!')
  })
